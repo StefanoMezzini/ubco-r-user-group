@@ -35,9 +35,12 @@ matrix(1:9, ncol = 3) %*% 6:8 # matrix multiplication
 matrix(1:9, ncol = 3) %*% matrix(1:6, ncol = 2)
 
 # grouping objects with different and types: lists
-list(letters = c('a', 'b', 'c'),
-     numbers = 1:10,
-     today = Sys.Date())
+l <- list(letters = c('a', 'b', 'c'),
+          numbers = 1:10,
+          today = Sys.Date())
+l
+l$letters
+l$today
 
 # lists with a table-like structure: data frames
 #' note: `data.frame()` recycles elements if the longest vector is a multiple
@@ -69,6 +72,7 @@ library('readr')
 d <- read_csv(file = 'data/example-data.csv',
               col_types = 'Did') # Date, integer, double (numeric)
 summary(d)
+d
 
 #' import `test-data.csv` and with the following column types (run `?read_csv` for help):
 #'  - *date*: date
@@ -76,6 +80,5 @@ summary(d)
 #'  - *volume_ml*: number or double
 #'  - *with_buffer*: logical
 #'  - *passed*: factor
-read_csv('data/test-data.csv', col_types = 'Dcdlf')
-
+read_csv('data/test-data.csv', col_types = '?')
 # what are the parsing issues? see if you can edit the csv to fix them
