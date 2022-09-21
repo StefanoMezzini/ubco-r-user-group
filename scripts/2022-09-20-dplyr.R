@@ -10,14 +10,16 @@ penguins$species # base R way
 pull(penguins, species) # "tidy" way
 
 #' relocate a column within `penguins`
-relocate(penguins, island, .before = species)
+relocate(.data = penguins, island, .before = species)
 relocate(penguins, year, .before = 1)
+relocate(penguins, year, .before = 3)
+relocate(penguins, year, .after = 3)
 relocate(penguins, island, .after = last_col())
 
 # add or change some columns (at the end of the data.frame)
 mutate(penguins,
        sex = stringr::str_to_title(sex), # capitalize first initials
-       year = as.numeric(year), # change from integer to year
+       year = as.numeric(year), # change year from integer to decimal
        bill_length_depth_ratio = bill_length_mm / bill_depth_mm,
        flipper_length_mass_ratio = bill_length_mm / body_mass_g)
 
@@ -42,7 +44,9 @@ transmute(penguins,
                  .fns = round))
 
 # change the name of some columns
-rename(penguins, Species = species, Location = island)
+rename(penguins,
+       Species = species,
+       Location = island)
 
 # select only some of the columns
 select(penguins, species, island, body_mass_g)
@@ -75,8 +79,12 @@ arrange(penguins, desc(year), desc(sex))
 bind_rows(penguins[1:3, ], # first 3 rows (base R)
           slice(penguins, 20:22)) # rows 20-22 (tidy way)
 
+#' `bind_rows()` places `NA`s if a column is missing
+bind_rows(penguins[1:3, -1], # first 3 rows, drop first column (base R)
+          slice(penguins, 20:22)) # rows 20-22 (tidy way)
+
 # bind columns together
-bind_cols(select(penguins, species, island),
+bind_cols(penguins[ , c('species', 'island')],
           select(penguins, sex, body_mass_g))
 
 # summarize the dataset
@@ -95,9 +103,9 @@ penguins %>%
   filter(! is.na(sex)) %>% # remove penguins with unknown sex
   group_by(species, sex) %>% # group by species and sex
   summarize(sample_size = n(),
-          mean_flipper_length_mm = mean(flipper_length_mm),
-          median_body_mass_g = median(body_mass_g, na.rm = TRUE),
-          max_year = max(year))
+            mean_flipper_length_mm = mean(flipper_length_mm),
+            median_body_mass_g = median(body_mass_g, na.rm = TRUE),
+            max_year = max(year))
 
 # let's break things a bit...
 d <- mutate(penguins, id = 1:n()) # add a column with unique IDs
