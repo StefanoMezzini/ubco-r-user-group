@@ -76,7 +76,7 @@ ggplot(penguins, aes(flipper_length_mm, fill = species)) +
 # create separate facets for each species and sex, in a grid
 ggplot(penguins, aes(flipper_length_mm, fill = species)) +
   facet_grid(sex ~ species, scales = 'free_y') + # 2-sided formula (check axes)
-  geom_histogram(color = 'black', alpha = 0.5, binwidth = 10) +
+  geom_histogram(color = 'black', alpha = 0.5, binwidth = 10) + # wider bin width
   scale_fill_viridis_d('Species', option = 'viridis')
 
 # create density plots of flipper length
@@ -86,23 +86,27 @@ ggplot(penguins, aes(flipper_length_mm, fill = species)) +
   scale_fill_viridis_d('Species', option = 'viridis')
 
 # create a boxplot of the flipper length 
+ggplot(penguins, aes(x = sex, y = flipper_length_mm)) +
+  facet_grid(species ~ ., scales = 'free_y') +
+  geom_boxplot(fill = 'grey')
+
 ggplot(penguins, aes(y = flipper_length_mm)) +
   facet_grid(sex ~ species, scales = 'free_y') +
   geom_boxplot(fill = 'grey') +
-  scale_fill_viridis_d('Species', option = 'viridis')
+  scale_x_continuous(breaks = NULL)
 
 # create a bar plot of average bill depth with error bars
 p1 <-
   penguins %>%
-  filter(! is.na(sex)) %>%
-  group_by(species, sex) %>%
-  summarize(depth = mean(bill_depth_mm)) %>%
-  mutate(lower = depth - 2,
-         upper = depth + 2) %>%
+  filter(! is.na(sex)) %>% # remove NAs
+  group_by(species, sex) %>% # calculate stats for each species and sex
+  summarize(depth = mean(bill_depth_mm)) %>% # calculate mean bill depth
+  mutate(lower_ci = depth - 2, # add fictitious CIs as an aexample
+         upper_ci = depth + 2) %>%
   ggplot() +
   facet_grid(species ~ .) +
   geom_col(aes(sex, depth, fill = sex), width = 0.5, show.legend = FALSE) +
-  geom_errorbar(aes(sex, ymin = lower, ymax = upper), width = 0.5)
+  geom_errorbar(aes(sex, ymin = lower_ci, ymax = upper_ci), width = 0.5)
 p1
 
 # use a log10 y axis
