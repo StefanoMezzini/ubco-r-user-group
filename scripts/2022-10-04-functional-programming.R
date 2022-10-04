@@ -20,6 +20,9 @@ x
 #' add 1 to each value of `x` vectorially
 x + 1
 
+# take square root
+sqrt(x)
+
 #' `for` *loops* ----
 #' create a list of 5 vectors of 10 random normal values
 y <- list()
@@ -31,7 +34,7 @@ y[[5]] <- rnorm(n = 10)
 y
 
 #' create the list using `for` loops
-for(i in 1:5) {
+for(i in c(1, 2, 3, 4, 5)) {
   y[[i]] <- rnorm(n = 10)
 }
 y
@@ -41,38 +44,43 @@ y <- lapply(X = rep(x = 10, 5), FUN = rnorm)
 y
 
 #' summarize each vector of `y` to its mean
-lapply(y, mean)
+lapply(X = y, FUN = mean)
 
 #' summarize as above, but simplify the list to a vector
 #' (this only works if all lements are of the same type)
-sapply(y, mean)
+sapply(X = y, FUN = mean)
 
 #' repeat this in a tibble
 library('dplyr') # for data wrangling
-tibble(samples = lapply(rep(x = 10, 5), rnorm),
+tibble(samples = lapply(c(10, 17, 4, 20), rnorm),
        means = sapply(samples, mean))
 
 #' repeat this using tidy functions
 library('purrr') # for tidy functional programming
-tibble(samples = map(.x = rep(x = 10, 5), .f = rnorm), # all allowed (list)
+tibble(samples = map(.x = c(10, 17, 6, 24), .f = rnorm), # all allowed (list)
        means = map_dbl(samples, mean)) # only doubles allowed
+
+tibble(samples = map(.x = c(10, 17, 6, 24), .f = rnorm), # all allowed (list)
+       means = map_chr(samples, mean)) # only characters allowed
 
 #' more functions from `purrr`
 d <-
   tibble(start = 1:10,
-       int = map_int(start, function(number) number + 1L), # integers only
-       let = map_chr(int, \(num) letters[num]),            # characters only
-       dec = map_dbl(start, \(num) num + pi),              # numeric only
-       even = map_lgl(int, \(num) num %% 2 == 0),            # TRUE/FALSE only
-       descr = map2_chr(.x = int, .y = even,
-                        .f = \(..x, ..y) if_else(..y,
-                                                 paste(..x, 'is even.'),
-                                                 paste(..x, 'is odd.'))))
+         int = map_int(start, function(number) number + 1L), # integers only
+         let = map_chr(int, \(num) letters[num]),            # characters only
+         dec = map_dbl(start, \(num) num + pi),              # numeric only
+         even = map_lgl(int, \(num) num %% 2 == 0),          # TRUE/FALSE only
+         descr = map2_chr(.x = int, .y = even,
+                          .f = \(..x, ..y) if_else(condition = ..y,
+                                                   true = paste(..x, 'is even.'),
+                                                   false = paste(..x, 'is odd.'))))
 d
 
 # remember that vectorial operations are faster though!
 mutate(d,
-       descr_2 = if_else(even, paste(int, 'is even.'), paste(int, 'is odd.')))
+       descr_2 = if_else(condition = even,
+                         true = paste(int, 'is even.'),
+                         false = paste(int, 'is odd.')))
 
 #' common error with `map_***()` if vector type is wrong
 map_dbl(1:10, as.character)
