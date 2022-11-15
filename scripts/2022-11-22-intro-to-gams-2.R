@@ -2,44 +2,8 @@
 library('mgcv')    # for Generalized Additive Models (GAMs) and more families
 library('faraway') # for datasets
 library('ggplot2') # for fancy plots
-library('cowplot') # for fancy multi-panel plots
 library('dplyr')   # for data wrangling
 theme_set(theme_bw())
-
-# when terms are nonlinear, use a GAM ----
-# diabetes and obesity using ... ----
-?diabetes # see "Details" section
-
-# ... chol, age, gender, and weight as predictors and...
-## ... glyhb as the response ----
-m_diab_1 <- gam(glyhb ~ s(chol) + s(age) + gender + s(weight),
-                family = 'choose a family',
-                data = diabetes,
-                method = 'REML') # REstricted Maximum Likelihood
-
-# plotting the GAM with base plot()
-plot(m_diab_1,
-     all.terms = TRUE, # include parametric gender term
-     pages = 1,        # all plots in one page
-     scheme = 1,       # use shaded CIs instead of dashed lines
-     trans = exp)      # return to response scale, i.e. (0, Inf)
-
-## ... a binary variable of diabetic or not as the response ----
-diabetes <- mutate(diabetes, diabetic = glyhb > 7)
-
-ggplot(diabetes) +
-  geom_histogram(aes(glyhb, fill = diabetic), bins = 12, color = 1) +
-  geom_vline(xintercept = 7, color = 2) +
-  scale_fill_brewer('Diabetic', type = 'qual', palette = 6,
-                    labels = c('No', 'Yes'), direction = -1)
-
-m_diab_2 <- gam(diabetic ~ s(chol) + s(age) + gender + s(weight),
-                family = 'choose a family',
-                data = diabetes,
-                method = 'REML')
-
-plot(m_diab_2, all.terms = TRUE, pages = 1, scheme = 1,
-     trans = m_diab_2$family$linkinv)
 
 # simulated Normalized Difference Vegetation Index ("greenness") ----
 source('https://github.com/StefanoMezzini/misc/raw/main/simulated-ndvi-data.R')
@@ -110,11 +74,11 @@ plot(m_temp_ls, scheme = 1, all.terms = FALSE, pages = 1)
 
 # choose k carefully!
 gam(list(jasper ~ s(year, k = 100),
-           ~ s(year, k = 10)),
-      family = 'choose a family',
-      data = globwarm,
-      method = 'REML',
-      knots = list(doy = c(0, 366))) %>%
+         ~ s(year, k = 10)),
+    family = 'choose a family',
+    data = globwarm,
+    method = 'REML',
+    knots = list(doy = c(0, 366))) %>%
   plot(scheme = 1, all.terms = FALSE, pages = 1)
 
 gam(list(jasper ~ s(year, k = 5),
