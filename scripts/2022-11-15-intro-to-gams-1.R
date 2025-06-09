@@ -8,11 +8,10 @@ theme_set(theme_bw())
 ?mgcv::family.mgcv
 
 # when terms are nonlinear, use a GAM ----
-# diabetes and obesity using ... ----
+# using chol, age, gender, and weight as predictors and... ----
 ?diabetes # see "Details" section
 range(diabetes$glyhb, na.rm = TRUE)
 
-# ... chol, age, gender, and weight as predictors and...
 ## ... glyhb as the response ----
 m_diab_1 <- gam(glyhb ~ s(chol) + s(age) + gender + s(weight),
                 family = Gamma(link = 'log'),
